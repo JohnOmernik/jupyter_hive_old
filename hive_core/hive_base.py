@@ -303,9 +303,9 @@ class Hive(Magics):
                        if self.debug:
                            print("Testing max_colwidth: %s" %  pd.get_option('max_colwidth'))
                        if self.hive_opts['pd_use_beaker'][0] == True:
-                          display(TableDisplay(results_df))
+                          display(TableDisplay(result_df))
                        else:
-                           display(HTML(results_df.to_html(index=self.hive_opts['pd_display_idx'][0])))
+                           display(HTML(result_df.to_html(index=self.hive_opts['pd_display_idx'][0])))
                    else:
                        print("Number of results (%s) greater than pd_display_max(%s)" % (mycnt, self.hive_opts['pd_display.max_rows'][0]))
 
