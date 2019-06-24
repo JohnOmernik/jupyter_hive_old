@@ -205,7 +205,7 @@ class Hive(Magics):
         result = -1
         try:
             # To do, allow settings hive setting from ENV
-            self.mysession = hivemod.Connection(host=self.hive_opts['hive_base_url_host'][0], port=self.hive_opts['hive_base_url_port'][0], username=self.hive_opts['hive_user'])
+            self.mysession = hivemod.Connection(host=self.hive_opts['hive_base_url_host'][0], port=self.hive_opts['hive_base_url_port'][0], username=self.hive_opts['hive_user'][0])
             result = 0
         except:
             print("Hive Connection Error!")
