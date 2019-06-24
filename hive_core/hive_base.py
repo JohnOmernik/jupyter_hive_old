@@ -222,12 +222,12 @@ class Hive(Magics):
                 df = pd.read_sql(query, self.mysession)
                 status = "Success"
             except:
-                r = None
+                df = None
                 print("Exception Running Query: Disconnection")
                 status = "Failure"
             endtime = int(time.time())
             query_time = endtime - starttime
-            return r, query_time, status
+            return df, query_time, status
 
 
     def displayHelp(self):
