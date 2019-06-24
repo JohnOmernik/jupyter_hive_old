@@ -1,0 +1,12 @@
+jupyterhub>=0.5
+sasl
+thrift
+thrift-sasl
+pyhive[hive]
+marathon
+requests
+requests_toolbelt
+IPython
+getpass
+pandas
+ipywidgets
