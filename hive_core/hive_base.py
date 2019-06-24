@@ -292,7 +292,7 @@ class Hive(Magics):
                 if status == "Failure":
                     pass
                 else:
-                   myrecs = jrecs['rows']
+ #                  myrecs = jrecs['rows']
                    df = result_df[cols]
                    self.myip.user_ns['prev_hive'] = result_df
                    mycnt = len(result_df)
