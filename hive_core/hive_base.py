@@ -146,13 +146,13 @@ class Hive(Magics):
 
     def disconnectHive(self):
         if self.hive_connected == True:
-            print("Disconnected Hive Session from %s" % self.hive_opts['hive_url'][0])
+            print("Disconnected Hive Session from %s" % self.hive_opts['hive_base_url'][0])
         else:
             print("Hive Not Currently Connected - Resetting All Variables")
         self.mysession = None
         self.hive_pass = None
         self.hive_connected = False
-        self.hive_opts['hive_url'][0] = ''
+        self.hive_opts['hive_base_url'][0] = ''
 
     def connectHive(self, prompt=False):
         global tpass
@@ -190,7 +190,7 @@ class Hive(Magics):
             result = self.authHive()
             if result == 0:
                 self.hive_connected = True
-                print("%s - Hive Connected!" % self.hive_opts['hive_url'][0])
+                print("%s - Hive Connected!" % self.hive_opts['hive_base_url'][0])
             else:
                 print("Connection Error - Perhaps Bad Usename/Password?")
 
