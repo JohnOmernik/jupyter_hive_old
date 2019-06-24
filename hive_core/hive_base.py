@@ -54,11 +54,11 @@ class Hive(Magics):
 
     # Get Env items (User and/or Base URL)
     try:
-        tuser = os.environ['JPY_USER']
+        tuser = os.environ['JUPYTER_USER']
     except:
         tuser = ''
     try:
-        turl = os.environ['HIVE_BASE_URL']
+        turl = os.environ['JUPYTER_HIVE_BASE_URL']
     except:
         turl = ""
 
