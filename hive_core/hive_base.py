@@ -18,6 +18,7 @@ from pyhive import hive as hivemod
 
 try:
     from beakerx import *
+    from beakerx.object import beakerx
 except:
     pass
 
