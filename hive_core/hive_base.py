@@ -3,14 +3,14 @@
 import requests
 import socket
 import json
-from getpass import getpass
+#from getpass import getpass
 import sys
 import os
 import time
 from IPython.core.magic import (Magics, magics_class, line_magic, cell_magic, line_cell_magic)
 from requests.packages.urllib3.exceptions import SubjectAltNameWarning, InsecureRequestWarning
-from requests_toolbelt.adapters import host_header_ssl
-requests.packages.urllib3.disable_warnings(SubjectAltNameWarning)
+#from requests_toolbelt.adapters import host_header_ssl
+#requests.packages.urllib3.disable_warnings(SubjectAltNameWarning)
 from collections import OrderedDict
 from IPython.core.display import HTML
 import pandas as pd
