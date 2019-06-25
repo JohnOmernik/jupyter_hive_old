@@ -150,9 +150,7 @@ class Hive(Magics):
         else:
             print("Hive Not Currently Connected - Resetting All Variables")
         self.mysession = None
-        self.hive_pass = None
         self.hive_connected = False
-        self.hive_opts['hive_base_url'][0] = ''
 
     def connectHive(self, prompt=False):
         global tpass
@@ -223,8 +221,23 @@ class Hive(Magics):
                 status = "Success"
             except Exception as e:
                 mydf = None
-                print("Query Error: %s" % str(e))
-                status = "Failure"
+                str_err = str(e)
+                if str_err.find("Broken pipe") >= 0:
+                    print("Hive Service Disconnected - Reconnecting and Retrying")
+                    self.discconectHive()
+                    self.connectHive()
+                    try:
+                        mydf = pd.read_sql(query, self.mysession)
+                        status = "Success"
+                        print("Your session was reconnected, session information likely lost")
+                    except Exception as e1:
+                        mydf = None
+                        str_err = str(e)
+                        print("Query Error: %s" % str(e))
+                        status = "Failure"
+                else:
+                    print("Query Error: %s" % str(e))
+                    status = "Failure"
             endtime = int(time.time())
             query_time = endtime - starttime
             return mydf, query_time, status
