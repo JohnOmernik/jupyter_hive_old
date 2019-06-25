@@ -221,7 +221,7 @@ class Hive(Magics):
             try:
                 mydf = pd.read_sql(query, self.mysession)
                 status = "Success"
-            except Exception, e:
+            except Exception as e:
                 mydf = None
                 print("Query Error: %s" % str(e))
                 status = "Failure"
