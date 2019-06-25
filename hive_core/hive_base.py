@@ -224,7 +224,7 @@ class Hive(Magics):
                 str_err = str(e)
                 if str_err.find("Broken pipe") >= 0:
                     print("Hive Service Disconnected - Reconnecting and Retrying")
-                    self.discconectHive()
+                    self.disconnectHive()
                     self.connectHive()
                     try:
                         mydf = pd.read_sql(query, self.mysession)
