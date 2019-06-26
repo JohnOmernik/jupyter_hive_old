@@ -317,7 +317,7 @@ class Hive(Magics):
                        if self.debug:
                            print("Testing max_colwidth: %s" %  pd.get_option('max_colwidth'))
                        if self.hive_opts['pd_use_beaker'][0] == True:
-                           if self.hive_opts['pd_beaker_bool_workaround'] == True:
+                           if self.hive_opts['pd_beaker_bool_workaround'][0]== True:
                                 for x in result_df.columns:
                                     if result_df.dtypes[x] == 'bool':
                                         result_df[x] = result_df[x].astype(object)
