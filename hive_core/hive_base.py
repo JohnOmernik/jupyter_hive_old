@@ -48,6 +48,7 @@ class Hive(Magics):
     hive_opts['pd_display.max_rows'] = [1000, 'Number of Max Rows']
     hive_opts['pd_display.max_columns'] = [None, 'Max Columns']
     hive_opts['pd_use_beaker'] = [False, 'Use the Beaker system for Pandas Display']
+    hive_opts['pd_beaker_bool_workaround'] = [True, 'Look for Dataframes with bool columns, and make it object for display in BeakerX']
 
     pd.set_option('display.max_columns', hive_opts['pd_display.max_columns'][0])
     pd.set_option('display.max_rows', hive_opts['pd_display.max_rows'][0])
@@ -316,7 +317,11 @@ class Hive(Magics):
                        if self.debug:
                            print("Testing max_colwidth: %s" %  pd.get_option('max_colwidth'))
                        if self.hive_opts['pd_use_beaker'][0] == True:
-                          display(TableDisplay(result_df))
+                           if self.hive_opts['pd_beaker_bool_workaround'] == True:
+                                for x in result_df.columns:
+                                    if result_df.dtypes[x] == 'bool':
+                                        result_df[x] = result_df[x].astype(object)
+                           display(TableDisplay(result_df))
                        else:
                            display(HTML(result_df.to_html(index=self.hive_opts['pd_display_idx'][0])))
                    else:
