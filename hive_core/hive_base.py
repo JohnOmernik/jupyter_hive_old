@@ -71,6 +71,7 @@ class Hive(Magics):
     hive_opts['hive_base_url_host'] = ["", "Hostname of hive connection derived from hive_base_url"]
     hive_opts['hive_base_url_port'] = ["", "Port of hive connection derived from hive_base_url"]
     hive_opts['hive_base_url_scheme'] = ["", "Scheme of hive connection derived from hive_base_url"]
+    hive_opts['hive_verbose_errors'] = [False, "Print the whole hive error if True, else try to only print the relavent"]
 
     # Class Init function - Obtain a reference to the get_ipython()
     def __init__(self, shell, pd_use_beaker=False, *args, **kwargs):
@@ -124,7 +125,7 @@ class Hive(Magics):
 
     def setvar(self, line):
         pd_set_vars = ['pd_display.max_columns', 'pd_display.max_rows', 'pd_max_colwidth', 'pd_use_beaker']
-        allowed_opts = pd_set_vars + ['pd_replace_crlf', 'pd_display_idx', 'hive_base_url']
+        allowed_opts = pd_set_vars + ['pd_replace_crlf', 'pd_display_idx', 'hive_base_url', 'hive_verbose_errors']
 
         tline = line.replace('set ', '')
         tkey = tline.split(' ')[0]
@@ -225,12 +226,15 @@ class Hive(Magics):
                 mydf = None
             except Exception as e:
                 str_err = str(e)
-                msg_find = "errorMessage=\""
-                em_start = str_err.find(msg_find)
-                find_len = len(msg_find)
-                em_end = str_err[em + find_len:].find("\"")
-                str_out = str_err[em + find_len:em + em1 + find_len]
-                status = "Failure - query_error: " + str_out
+                if hive_opts['hive_verbose_errors'][0] == True:
+                    status = "Failure - query_error: " + str_err
+                else:
+                    msg_find = "errorMessage=\""
+                    em_start = str_err.find(msg_find)
+                    find_len = len(msg_find)
+                    em_end = str_err[em_start + find_len:].find("\"")
+                    str_out = str_err[em_start + find_len:em_start + em_end + find_len]
+                    status = "Failure - query_error: " + str_out
             endtime = int(time.time())
             query_time = endtime - starttime
         else:
