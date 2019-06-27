@@ -226,7 +226,7 @@ class Hive(Magics):
                 mydf = None
             except Exception as e:
                 str_err = str(e)
-                if hive_opts['hive_verbose_errors'][0] == True:
+                if self.hive_opts['hive_verbose_errors'][0] == True:
                     status = "Failure - query_error: " + str_err
                 else:
                     msg_find = "errorMessage=\""
