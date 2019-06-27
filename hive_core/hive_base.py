@@ -214,34 +214,31 @@ class Hive(Magics):
     def runQuery(self, query):
         if query.find(";") >= 0:
             print("WARNING - Do not type a trailing semi colon on queries, your query will fail (like it probably did here)")
-    
+        mydf = None
         if self.hive_connected == True:
             starttime = int(time.time())
             try:
                 mydf = pd.read_sql(query, self.mysession)
                 status = "Success"
-            except Exception as e:
+            except (TypeError):
+                status = "Success - No Results"
                 mydf = None
+            except Exception as e:
                 str_err = str(e)
-                if str_err.find("Broken pipe") >= 0:
-                    print("Hive Service Disconnected - Reconnecting and Retrying")
-                    self.disconnectHive()
-                    self.connectHive()
-                    try:
-                        mydf = pd.read_sql(query, self.mysession)
-                        status = "Success"
-                        print("Your session was reconnected, session information likely lost")
-                    except Exception as e1:
-                        mydf = None
-                        str_err = str(e)
-                        print("Query Error: %s" % str(e))
-                        status = "Failure"
-                else:
-                    print("Query Error: %s" % str(e))
-                    status = "Failure"
+                msg_find = "errorMessage=\""
+                em_start = str_err.find(msg_find)
+                find_len = len(msg_find)
+                em_end = str_err[em + find_len:].find("\"")
+                str_out = str_err[em + find_len:em + em1 + find_len]
+                status = "Failure - query_error: " + str_out
             endtime = int(time.time())
             query_time = endtime - starttime
-            return mydf, query_time, status
+        else:
+            mydf = None
+            query_time = 0
+            status = "Hive Not Connected"
+
+        return mydf, query_time, status
 
 
     def displayHelp(self):
@@ -303,11 +300,11 @@ class Hive(Magics):
             cell = cell.replace("\r", "")
             if self.hive_connected == True:
                 result_df, qtime, status = self.runQuery(cell)
-                if status == "Failure":
-                    pass
+                if status.find("Failure") == 0:
+                    print("Error: %s" % status)
+                elif status.find("Success - No Results") == 0:
+                    print("No Results returned in %s seconds" % qtime)
                 else:
- #                  myrecs = jrecs['rows']
-#                   df = result_df[cols]
                    self.myip.user_ns['prev_hive'] = result_df
                    mycnt = len(result_df)
                    print("%s Records in Approx %s seconds" % (mycnt,qtime))
