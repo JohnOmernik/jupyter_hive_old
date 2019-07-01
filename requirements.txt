@@ -1,7 +1,7 @@
 jupyterhub>=0.5
 sasl
-thrift
-pyhive[hive]
+thrift==0.9.3
+pyhive[hive]==0.2.1
 requests
 IPython
 pandas
