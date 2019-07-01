@@ -90,7 +90,8 @@ class Hive(Magics):
         print("")
         print("{: <30} {: <50}".format(*["Connected:", str(self.hive_connected)]))
         print("{: <30} {: <50}".format(*["Debug Mode:", str(self.debug)]))
-
+        print(""
+        print("Hive Status URL: http://%s:10002/hiveserver2.jsp" % self.hive_base_url_host)
         print("")
         print("Display Properties:")
         print("-----------------------------------")
@@ -151,6 +152,10 @@ class Hive(Magics):
             print("Disconnected Hive Session from %s" % self.hive_opts['hive_base_url'][0])
         else:
             print("Hive Not Currently Connected - Resetting All Variables")
+        try:
+            self.mysession.close()
+        except:
+            print("Disconnect error: making session None")
         self.mysession = None
         self.hive_connected = False
 
