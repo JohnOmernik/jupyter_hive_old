@@ -90,7 +90,7 @@ class Hive(Magics):
         print("")
         print("{: <30} {: <50}".format(*["Connected:", str(self.hive_connected)]))
         print("{: <30} {: <50}".format(*["Debug Mode:", str(self.debug)]))
-        print(""
+        print("")
         print("Hive Status URL: http://%s:10002/hiveserver2.jsp" % self.hive_base_url_host)
         print("")
         print("Display Properties:")
