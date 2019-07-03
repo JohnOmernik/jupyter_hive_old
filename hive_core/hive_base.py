@@ -56,7 +56,7 @@ class Hive(Magics):
 
     # Get Env items (User and/or Base URL)
     try:
-        tuser = os.environ['JUPYTER_USER']
+        tuser = os.environ['JUPYTERHUB_USER']
     except:
         tuser = ''
     try:
