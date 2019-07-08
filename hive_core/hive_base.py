@@ -227,6 +227,7 @@ class Hive(Magics):
         if query.find(";") >= 0:
             print("WARNING - Do not type a trailing semi colon on queries, your query will fail (like it probably did here)")
         mydf = None
+        status = ""
         if self.hive_connected == True:
             starttime = int(time.time())
             try:
@@ -236,6 +237,7 @@ class Hive(Magics):
                 status = "Success - No Results"
                 mydf = None
             except Exception as e:
+                handle_error = True
                 str_err = str(e)
                 msg_disconnect = "[Errno 32] Broken pipe"
                 msg_find = "errorMessage=\""
@@ -245,26 +247,29 @@ class Hive(Magics):
                     self.disconnectHive()
                     print("Attempting Reconnect")
                     self.connectHive()
-                    if self.mysession is not None
+                    if self.mysession is not None:
                         try:
                             mydf = pd.read_sql(orig_query, self.mysession)
                             status = "Success"
+                            handle_error = False
                         except (TypeError):
                             status = "Success - No results"
                             mydf = None
+                            handle_error = False
                         except exception as e1:
                             str_err = str(e1)
                             status = "Failure - error after reconnect:\n%s" % str_err
                             mydf = None
                         self.runQuery(orig_query)
-                if self.hive_opts['hive_verbose_errors'][0] == True or str_err.find(msg_find) < 0:
-                    status = "Failure - query_error: " + str_err
-                else:
-                    em_start = str_err.find(msg_find)
-                    find_len = len(msg_find)
-                    em_end = str_err[em_start + find_len:].find("\"")
-                    str_out = str_err[em_start + find_len:em_start + em_end + find_len]
-                    status = "Failure - query_error: " + str_out
+                if handle_error == True:
+                    if self.hive_opts['hive_verbose_errors'][0] == True or str_err.find(msg_find) < 0:
+                        status = status + "\nFailure - query_error: " + str_err
+                    else:
+                        em_start = str_err.find(msg_find)
+                        find_len = len(msg_find)
+                        em_end = str_err[em_start + find_len:].find("\"")
+                        str_out = str_err[em_start + find_len:em_start + em_end + find_len]
+                        status = status + "\nFailure - query_error: " + str_out
             endtime = int(time.time())
             query_time = endtime - starttime
         else:
