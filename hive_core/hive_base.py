@@ -214,7 +214,7 @@ class Hive(Magics):
             result = 0
             if self.last_use != "":
                 print("Reconnect, running %s to get you back to your database" % self.last_use)
-                self.runQuery(self.last_use)
+                tdf, blahtime, blah = self.runQuery(self.last_use)
         except:
             print("Hive Connection Error!")
             result = -2
