@@ -245,7 +245,17 @@ class Hive(Magics):
                     self.disconnectHive()
                     print("Attempting Reconnect")
                     self.connectHive()
-                    if self.mysession is not None:
+                    if self.mysession is not None
+                        try:
+                            mydf = pd.read_sql(orig_query, self.mysession)
+                            status = "Success"
+                        except (TypeError):
+                            status = "Success - No results"
+                            mydf = None
+                        except exception as e1:
+                            str_err = str(e1)
+                            status = "Failure - error after reconnect:\n%s" % str_err
+                            mydf = None
                         self.runQuery(orig_query)
                 if self.hive_opts['hive_verbose_errors'][0] == True or str_err.find(msg_find) < 0:
                     status = "Failure - query_error: " + str_err
