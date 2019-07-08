@@ -33,7 +33,7 @@ class Hive(Magics):
     mysession = None
     hive_connected = False
     hive_pass = ""
-
+    last_use = ""
     debug = False
 
     # Variables Dictionary
@@ -212,12 +212,18 @@ class Hive(Magics):
             # To do, allow settings hive setting from ENV
             self.mysession = hivemod.Connection(host=self.hive_opts['hive_base_url_host'][0], port=self.hive_opts['hive_base_url_port'][0], username=self.hive_opts['hive_user'][0])
             result = 0
+            if self.last_use != "":
+                print("Reconnect, running %s to get you back to your database" % self.last_use)
+                self.runQuery(self.last_use)
         except:
             print("Hive Connection Error!")
             result = -2
         return result
 
     def runQuery(self, query):
+        if query.upper().find('USE ') == 0:
+            # This is a session component saving in case of disconnect
+            self.last_use = query
         if query.find(";") >= 0:
             print("WARNING - Do not type a trailing semi colon on queries, your query will fail (like it probably did here)")
         mydf = None
@@ -231,10 +237,10 @@ class Hive(Magics):
                 mydf = None
             except Exception as e:
                 str_err = str(e)
-                if self.hive_opts['hive_verbose_errors'][0] == True:
+                msg_find = "errorMessage=\""
+                if self.hive_opts['hive_verbose_errors'][0] == True or str_err.find(msg_find) < 0:
                     status = "Failure - query_error: " + str_err
                 else:
-                    msg_find = "errorMessage=\""
                     em_start = str_err.find(msg_find)
                     find_len = len(msg_find)
                     em_end = str_err[em_start + find_len:].find("\"")
