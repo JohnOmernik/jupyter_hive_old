@@ -60,7 +60,7 @@ class Hive(Magics):
     except:
         tuser = ''
     try:
-        turl = os.environ['JUPYTER_HIVE_BASE_URL']
+        turl = os.environ['JUPYTERHUB_HIVE_BASE_URL']
     except:
         turl = ""
 
