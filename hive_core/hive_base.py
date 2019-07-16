@@ -228,6 +228,7 @@ class Hive(Magics):
             print("WARNING - Do not type a trailing semi colon on queries, your query will fail (like it probably did here)")
         mydf = None
         status = ""
+        handle_error = False
         if self.hive_connected == True:
             starttime = int(time.time())
             try:
