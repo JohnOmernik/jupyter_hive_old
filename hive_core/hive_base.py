@@ -338,7 +338,9 @@ class Hive(Magics):
             cell = cell.replace("\r", "")
             if self.hive_connected == True:
                 result_df, qtime, status = self.runQuery(cell)
-                if status.find("Failure") == 0:
+                if self.debug:
+                    print("status: %s" % status)
+                if status.find("Failure") >= 0:
                     print("Error: %s" % status)
                 elif status.find("Success - No Results") == 0:
                     print("No Results returned in %s seconds" % qtime)
