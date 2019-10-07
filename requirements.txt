@@ -5,4 +5,3 @@ pyhive[hive]
 requests
 IPython
 pandas
-ipywidgets
