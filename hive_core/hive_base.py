@@ -66,7 +66,8 @@ class Hive(Magics):
 
     # Hive specific variables
     hive_opts['hive_max_rows'] = [1000, 'Max number of rows to return, will potentially add this to queries']
-    hive_opts['hive_user'] = [tuser, "User to connect with hive - Can be set via ENV Var: JPY_USER otherwise will prompt"]
+    hive_opts['hive_user'] = ['', "User to connect with hive - Can be set via ENV Var: JPY_USER otherwise will prompt"]
+    hive_opts['hive_orig_user'] = [tuser, "User to connect with hive - Can be set via ENV Var: JPY_USER otherwise will prompt"]
     hive_opts['hive_orig_url'] = [turl, 'Originally processed url from ENV']
     hive_opts['hive_base_url'] = ['', "URL to connect to Hive server. Can be set via ENV Var: HIVE_BASE_URL"]
     hive_opts['hive_base_url_host'] = ["", "Hostname of hive connection derived from hive_base_url"]
@@ -159,34 +160,36 @@ class Hive(Magics):
             print("Disconnect error: making session None")
         self.mysession = None
         self.hive_opts['hive_base_url'][0] = ""
+        self.hive_opts['hive_user'][0] = ""
         self.hive_connected = False
 
     def connectHive(self, prompt=False):
         global tpass
 
-        # If we are not prompting, we are trying the original urls (which are split by comma) We grab the first one. 
-        if prompt == False:
-            self.hive_opts['hive_base_url'][0] = self.hive_opts['hive_orig_url'][0].split(",")[0]
-        # Ok so now we have our prompt, 
         myprompt = prompt
         if self.hive_connected == False:
             # If the environment did not give us a user and url we need to change our pronot to True
-            if self.hive_opts['hive_user'][0] == '' or self.hive_opts['hive_orig_url'][0] == '':
+            if self.hive_opts['hive_orig_user'][0] == '' or self.hive_opts['hive_orig_url'][0] == '':
                 myprompt = True
 
             if myprompt == True:
-                print("User not specified in JPY_USER or user override requested")
+                print("User not specified in JUPYTERHUB_USER or user override requested")
+                print("")
+                print("JUPYTERHUB_USER: %s" % self.hive_opts['hive_orig_user'][0])
+                print("")
                 tuser = input("Please type user name if desired: ")
                 self.hive_opts['hive_user'][0] = tuser
                 print("")
-                print("HIVE Base URL not specified in HIVE_BASE_URL or override requested")
+                print("HIVE Base URL not specified in JUPYTERHUB_HIVE_BASE_URL or override requested")
                 print("")
-                print("HIVE_BASE_URL: %s" % self.hive_opts['hive_orig_url'][0])
+                print("JUPYTERHUB_HIVE_BASE_URL: %s" % self.hive_opts['hive_orig_url'][0])
                 print("")
-                turl = input("Please type in the full HIVE URL: ")
+                turl = input("Please type in the full Hive URL: ")
                 self.hive_opts['hive_base_url'][0] = turl
-                print("Connecting to Hive  URL: %s with user: %s" % (self.hive_opts['hive_base_url'][0], self.hive_opts['hive_user'][0]))
+                print("Connecting to Hive URL: %s with user: %s" % (self.hive_opts['hive_base_url'][0], self.hive_opts['hive_user'][0]))
                 print("")
+            else:
+                self.hive_opts['hive_user'][0] = self.hive_opts['hive_orig_user'][0]
 
 
             if self.hive_opts['hive_base_url'][0] != "":
