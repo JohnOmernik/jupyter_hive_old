@@ -67,7 +67,8 @@ class Hive(Magics):
     # Hive specific variables
     hive_opts['hive_max_rows'] = [1000, 'Max number of rows to return, will potentially add this to queries']
     hive_opts['hive_user'] = [tuser, "User to connect with hive - Can be set via ENV Var: JPY_USER otherwise will prompt"]
-    hive_opts['hive_base_url'] = [turl, "URL to connect to Hive server. Can be set via ENV Var: HIVE_BASE_URL"]
+    hive_opts['hive_orig_url'] = [turl, 'Originally processed url from ENV']
+    hive_opts['hive_base_url'] = ['', "URL to connect to Hive server. Can be set via ENV Var: HIVE_BASE_URL"]
     hive_opts['hive_base_url_host'] = ["", "Hostname of hive connection derived from hive_base_url"]
     hive_opts['hive_base_url_port'] = ["", "Port of hive connection derived from hive_base_url"]
     hive_opts['hive_base_url_scheme'] = ["", "Scheme of hive connection derived from hive_base_url"]
@@ -157,47 +158,61 @@ class Hive(Magics):
         except:
             print("Disconnect error: making session None")
         self.mysession = None
+        self.hive_opts['hive_base_url'][0] = ""
         self.hive_connected = False
 
     def connectHive(self, prompt=False):
         global tpass
+
+        # If we are not prompting, we are trying the original urls (which are split by comma) We grab the first one. 
+        if prompt == False:
+            self.hive_opts['hive_base_url'][0] = self.hive_opts['hive_orig_url'][0].split(",")[0]
+        # Ok so now we have our prompt, 
+        myprompt = prompt
         if self.hive_connected == False:
-            if prompt == True or self.hive_opts['hive_user'][0] == '':
+            # If the environment did not give us a user and url we need to change our pronot to True
+            if self.hive_opts['hive_user'][0] == '' or self.hive_opts['hive_orig_url'][0] == '':
+                myprompt = True
+
+            if myprompt == True:
                 print("User not specified in JPY_USER or user override requested")
                 tuser = input("Please type user name if desired: ")
                 self.hive_opts['hive_user'][0] = tuser
-            print("Connecting as user %s" % self.hive_opts['hive_user'][0])
-            print("")
-            if prompt == True or self.hive_opts['hive_base_url'][0] == '':
+                print("")
                 print("HIVE Base URL not specified in HIVE_BASE_URL or override requested")
+                print("")
+                print("HIVE_BASE_URL: %s" % self.hive_opts['hive_orig_url'][0])
+                print("")
                 turl = input("Please type in the full HIVE URL: ")
                 self.hive_opts['hive_base_url'][0] = turl
-            print("Connecting to Hive URL: %s" % self.hive_opts['hive_base_url'][0])
-            print("")
+                print("Connecting to Hive  URL: %s with user: %s" % (self.hive_opts['hive_base_url'][0], self.hive_opts['hive_user'][0]))
+                print("")
 
-            myurl = self.hive_opts['hive_base_url'][0]
-            ts1 = myurl.split("://")
-            self.hive_opts['hive_base_url_scheme'][0] = ts1[0]
-            t1 = ts1[1]
-            ts2 = t1.split(":")
-            self.hive_opts['hive_base_url_host'][0] = ts2[0]
-            self.hive_opts['hive_base_url_port'][0] = ts2[1]
 
-            # No hive password at this point, so we are not including it
-    #        print("Please enter the password you wish to connect with:")
-    #        tpass = ""
-    #        self.myip.ex("from getpass import getpass\ntpass = getpass(prompt='Drill Connect Password: ')")
-    #        tpass = self.myip.user_ns['tpass']
-
-   #         self.drill_pass = tpass
-   #         self.myip.user_ns['tpass'] = ""
-
-            result = self.authHive()
-            if result == 0:
-                self.hive_connected = True
-                print("%s - Hive Connected!" % self.hive_opts['hive_base_url'][0])
+            if self.hive_opts['hive_base_url'][0] != "":
+                myurls = self.hive_opts['hive_base_url'][0]
             else:
+                myurls = self.hive_opts['hive_orig_url'][0]
+
+            for myurl in myurls.split(","):
+                ts1 = myurl.split("://")
+                self.hive_opts['hive_base_url_scheme'][0] = ts1[0]
+                t1 = ts1[1]
+                ts2 = t1.split(":")
+                self.hive_opts['hive_base_url_host'][0] = ts2[0]
+                self.hive_opts['hive_base_url_port'][0] = ts2[1]
+
+                result = self.authHive()
+                if result == 0:
+                    self.hive_connected = True
+                    self.hive_opts['hive_base_url'][0] = myurl
+                    print("%s - Hive Connected!" % self.hive_opts['hive_base_url'][0])
+                    break
+                else:
+                    print("Connection Error - Trying next server")
+            if self.hive_connected == False:
                 print("Connection Error - Perhaps Bad Usename/Password?")
+
 
         else:
             print("Hive is already connected - Please type %hive for help on what you can you do")
@@ -260,7 +275,16 @@ class Hive(Magics):
                         except exception as e1:
                             str_err = str(e1)
                             status = "Failure - error after reconnect"
-                            mydf = None
+                        # No hive password at this point, so we are not including it
+    #        print("Please enter the password you wish to connect with:")
+    #        tpass = ""
+    #        self.myip.ex("from getpass import getpass\ntpass = getpass(prompt='Drill Connect Password: ')")
+    #        tpass = self.myip.user_ns['tpass']
+
+   #         self.drill_pass = tpass
+   #         self.myip.user_ns['tpass'] = ""
+
+                mydf = None
             if handle_error == True:
                if self.hive_opts['hive_verbose_errors'][0] == True or str_err.find(msg_find) < 0:
                    status = status + "\nFailure - query_error: " + str_err
