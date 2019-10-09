@@ -204,7 +204,10 @@ class Hive(Magics):
                 ts2 = t1.split(":")
                 self.hive_opts['hive_base_url_host'][0] = ts2[0]
                 self.hive_opts['hive_base_url_port'][0] = ts2[1]
-
+                self.hive_opts['hive_base_url'][0] = myurl
+                print("")
+                print("Trying: %s at %s" % (self.hive_opts['hive_user'][0], self.hive_opts['hive_base_url'][0]))
+                print("")
                 result = self.authHive()
                 if result == 0:
                     self.hive_connected = True
@@ -212,11 +215,10 @@ class Hive(Magics):
                     print("%s - Hive Connected!" % self.hive_opts['hive_base_url'][0])
                     break
                 else:
-                    print("Connection Error - Trying next server")
+                    self.hive_opts['hive_base_url'][0] = ""
+                    print("Connection Error %s at %s - Trying next server" % (self.hive_opts['hive_user'][0], self.hive_opts['hive_base_url'][0]))
             if self.hive_connected == False:
                 print("Connection Error - Perhaps Bad Usename/Password?")
-
-
         else:
             print("Hive is already connected - Please type %hive for help on what you can you do")
 
