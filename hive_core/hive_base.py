@@ -360,7 +360,7 @@ class Hive(Magics):
             elif line.lower() == "disconnect":
                 self.disconnectHive()
             elif line.lower() == "connect silent":
-                self.disconnectHive(False, True)
+                self.connectHive(False, True)
             elif line.lower() == "connect alt":
                 self.connectHive(True, False)
             elif line.lower() == "connect":
