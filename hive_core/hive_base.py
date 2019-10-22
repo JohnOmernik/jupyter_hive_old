@@ -163,10 +163,11 @@ class Hive(Magics):
         self.hive_opts['hive_user'][0] = ""
         self.hive_connected = False
 
-    def connectHive(self, prompt=False):
+    def connectHive(self, prompt=False, silent=False):
         global tpass
 
         myprompt = prompt
+
         if self.hive_connected == False:
             # If the environment did not give us a user and url we need to change our pronot to True
             if self.hive_opts['hive_orig_user'][0] == '' or self.hive_opts['hive_orig_url'][0] == '':
@@ -205,14 +206,16 @@ class Hive(Magics):
                 self.hive_opts['hive_base_url_host'][0] = ts2[0]
                 self.hive_opts['hive_base_url_port'][0] = ts2[1]
                 self.hive_opts['hive_base_url'][0] = myurl
-                print("")
-                print("Trying: %s at %s" % (self.hive_opts['hive_user'][0], self.hive_opts['hive_base_url'][0]))
-                print("")
+                if not silent:
+                    print("")
+                    print("Trying: %s at %s" % (self.hive_opts['hive_user'][0], self.hive_opts['hive_base_url'][0]))
+                    print("")
                 result = self.authHive()
                 if result == 0:
                     self.hive_connected = True
                     self.hive_opts['hive_base_url'][0] = myurl
-                    print("%s - Hive Connected!" % self.hive_opts['hive_base_url'][0])
+                    if not silent:
+                        print("%s - Hive Connected!" % self.hive_opts['hive_base_url'][0])
                     break
                 else:
                     self.hive_opts['hive_base_url'][0] = ""
@@ -267,7 +270,7 @@ class Hive(Magics):
                     print("Disconnection Detected")
                     self.disconnectHive()
                     print("Attempting Reconnect")
-                    self.connectHive()
+                    self.connectHive(False, False)
                     if self.mysession is not None:
                         try:
                             mydf = pd.read_sql(orig_query, self.mysession)
@@ -356,10 +359,12 @@ class Hive(Magics):
                 self.debug = not self.debug
             elif line.lower() == "disconnect":
                 self.disconnectHive()
+            elif line.lower() == "connect silent":
+                self.disconnectHive(False, True)
             elif line.lower() == "connect alt":
-                self.connectHive(True)
+                self.connectHive(True, False)
             elif line.lower() == "connect":
-                self.connectHive(False)
+                self.connectHive(False, False)
             elif line.lower() .find('set ') == 0:
                 self.setvar(line)
             else:
